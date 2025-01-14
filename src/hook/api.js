@@ -16,6 +16,7 @@ const login = (email, password) => {
     return response
   })
 }
+
 const getAllUser = () => {
   const token = localStorage.getItem('token')
   return axios.get(`${BASE_URL}/users/`, {
@@ -24,6 +25,7 @@ const getAllUser = () => {
     }
   })
 }
+
 const getAllDevice = () => {
   const token = localStorage.getItem('token')
   return axios.get(`${BASE_URL}/devices/`, {
@@ -33,5 +35,32 @@ const getAllDevice = () => {
   })
 }
 
-export { login, getAllUser,getAllDevice }
+const addDevice = (deviceData) => {
+  const token = localStorage.getItem('token')
+  return axios.post(`${BASE_URL}/devices/`, deviceData, {
+    headers: {
+      'Authorization': `Bearer ${token}`, // Gửi token trong header
+    }
+  })
+}
 
+const updateDevice = (deviceId, deviceData) => {
+  const token = localStorage.getItem('token')
+  return axios.put(`${BASE_URL}/devices/${deviceId}`, deviceData, {
+    headers: {
+      'Authorization': `Bearer ${token}`, // Gửi token trong header
+    }
+  })
+}
+
+// Hàm xóa thiết bị
+const deleteDevice = (deviceId) => {
+  const token = localStorage.getItem('token')
+  return axios.delete(`${BASE_URL}/devices/${deviceId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`, // Gửi token trong header
+    }
+  })
+}
+
+export { login, getAllUser, getAllDevice, addDevice, updateDevice, deleteDevice }
