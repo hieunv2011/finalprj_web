@@ -21,7 +21,9 @@ const Tabs = React.lazy(() => import('./views/base/tabs/Tabs'))
 const Tables = React.lazy(() => import('./views/base/tables/Tables'))
 const Tooltips = React.lazy(() => import('./views/base/tooltips/Tooltips'))
 const User = React.lazy(() => import('../src/views/pages/users/User'))
+const UserInfomation = React.lazy(() => import('../src/views/pages/users/UserInfomation'))
 const Device = React.lazy(() => import('../src/views/pages/devices/Device'))
+const DeviceInfomation = React.lazy(() => import('../src/views/pages/devices/DeviceInfomation'))
 // Buttons
 const Buttons = React.lazy(() => import('./views/buttons/buttons/Buttons'))
 const ButtonGroups = React.lazy(() => import('./views/buttons/button-groups/ButtonGroups'))
@@ -76,7 +78,9 @@ const routes = [
   { path: '/base/tables', name: 'Tables', element: Tables },
   { path: '/base/tooltips', name: 'Tooltips', element: Tooltips },
   { path: '/user', name: 'User', element: User },
+  { path: '/userInfomation', name: 'UserInfomation', element: UserInfomation },
   { path: '/device', name: 'Device', element: Device },
+  { path: '/deviceInfomation/:deviceId', name: 'Device', element: DeviceInfomation },
 
 
 

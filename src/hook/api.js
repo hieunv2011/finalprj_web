@@ -62,5 +62,57 @@ const deleteDevice = (deviceId) => {
     }
   })
 }
+const getDeviceInfomation = (deviceId) => {
+  const token = localStorage.getItem('token');
+  return axios.get(`${BASE_URL}/devices/${deviceId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`, // Gửi token trong header
+    },
+  });
+};
+const getUserDevices = (userId) => {
+  const token = localStorage.getItem('token');
+  return axios.get(`${BASE_URL}/users/${userId}/user-devices`, {
+    headers: {
+      'Authorization': `Bearer ${token}`, // Gửi token trong header
+    },
+  });
+};
+const assignDeviceToUser = (userId, deviceIdArray) => {
+  const token = localStorage.getItem('token');
+  
+  return axios.post(`${BASE_URL}/users/assign-device`, 
+    {
+      userId: userId, // userId của người dùng
+      deviceId: deviceIdArray, // Mảng deviceId cần gắn cho người dùng
+    },
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`, // Gửi token trong header
+      }
+    }
+  );
+};
 
-export { login, getAllUser, getAllDevice, addDevice, updateDevice, deleteDevice }
+const removeDeviceFromUser = async (userId, deviceId) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await axios.delete(`${BASE_URL}/users/remove-device`, {
+      data: {
+        userId,
+        deviceId,
+      },
+      headers: {
+        'Authorization': `Bearer ${token}`, // Gửi token trong header
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi xóa thiết bị:', error);
+    throw error;
+  }
+};
+
+
+export { login, getAllUser, getAllDevice, addDevice, updateDevice, deleteDevice, 
+  getDeviceInfomation,getUserDevices, assignDeviceToUser,removeDeviceFromUser }

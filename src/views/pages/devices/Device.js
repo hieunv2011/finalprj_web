@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   CCard,
   CCardBody,
@@ -20,15 +20,17 @@ import {
   CForm,
   CFormInput,
   CFormSelect,
-} from '@coreui/react';
-import { CIcon } from '@coreui/icons-react';
-import { cilPenAlt, cilTrash, cilLocationPin, cilPlus } from '@coreui/icons';
-import { getAllDevice, addDevice, updateDevice, deleteDevice } from '../../../hook/api';
+} from '@coreui/react'
+import { CIcon } from '@coreui/icons-react'
+import { cilPenAlt, cilTrash, cilLocationPin, cilPlus } from '@coreui/icons'
+import { getAllDevice, addDevice, updateDevice, deleteDevice } from '../../../hook/api'
+import { Link } from 'react-router-dom'
 
 const Device = () => {
-  const [devices, setDevices] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [devices, setDevices] = useState([])
+  const [modalVisible, setModalVisible] = useState(false)
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false) // Modal xác nhận xóa
+  const [selectedDevice, setSelectedDevice] = useState(null)
   const [newDevice, setNewDevice] = useState({
     deviceId: '',
     name: '',
@@ -36,88 +38,102 @@ const Device = () => {
     latitude: '',
     longitude: '',
     status: 'inactive',
-  });
-  const [isAddMode, setIsAddMode] = useState(false);
+  })
+  const [isAddMode, setIsAddMode] = useState(false)
 
   // Phân trang
-  const [currentPage, setCurrentPage] = useState(1);
-  const [devicesPerPage] = useState(5); // Số thiết bị hiển thị mỗi trang
+  const [currentPage, setCurrentPage] = useState(1)
+  const [devicesPerPage] = useState(5)
 
   useEffect(() => {
     getAllDevice()
       .then((response) => {
-        setDevices(response.data);
+        setDevices(response.data)
       })
       .catch((error) => {
-        console.error('Lỗi khi lấy thông tin thiết bị:', error);
-      });
-  }, []);
+        console.error('Lỗi khi lấy thông tin thiết bị:', error)
+      })
+  }, [])
 
-  // Lấy danh sách thiết bị theo trang
-  const indexOfLastDevice = currentPage * devicesPerPage;
-  const indexOfFirstDevice = indexOfLastDevice - devicesPerPage;
-  const currentDevices = devices.slice(indexOfFirstDevice, indexOfLastDevice);
+  const indexOfLastDevice = currentPage * devicesPerPage
+  const indexOfFirstDevice = indexOfLastDevice - devicesPerPage
+  const currentDevices = devices.slice(indexOfFirstDevice, indexOfLastDevice)
 
   const handleAddClick = () => {
-    setIsAddMode(true);
-    setNewDevice({ deviceId: '', name: '', location: '', latitude: '', longitude: '', status: 'inactive' });
-    setModalVisible(true);
-  };
+    setIsAddMode(true)
+    setNewDevice({
+      deviceId: '',
+      name: '',
+      location: '',
+      latitude: '',
+      longitude: '',
+      status: 'inactive',
+    })
+    setModalVisible(true)
+  }
 
   const handleEditClick = (device) => {
-    setIsAddMode(false);
-    setSelectedDevice(device);
-    setModalVisible(true);
-  };
+    setIsAddMode(false)
+    setSelectedDevice(device)
+    setModalVisible(true)
+  }
 
-  const handleDeleteClick = async (deviceId) => {
+  const handleDeleteClick = (device) => {
+    setSelectedDevice(device)
+    setDeleteModalVisible(true) // Hiển thị modal xác nhận xóa
+  }
+
+  const handleConfirmDelete = async () => {
     try {
-      await deleteDevice(deviceId);
-      setDevices((prevDevices) => prevDevices.filter(device => device.deviceId !== deviceId));
+      await deleteDevice(selectedDevice.deviceId)
+      setDevices((prevDevices) =>
+        prevDevices.filter((device) => device.deviceId !== selectedDevice.deviceId),
+      )
+      setDeleteModalVisible(false) // Đóng modal sau khi xóa thành công
     } catch (error) {
-      console.error('Lỗi khi xóa thiết bị:', error);
+      console.error('Lỗi khi xóa thiết bị:', error)
+      setDeleteModalVisible(false)
     }
-  };
+  }
 
   const handleCloseModal = () => {
-    setModalVisible(false);
-    setSelectedDevice(null);
-  };
+    setModalVisible(false)
+    setDeleteModalVisible(false) // Đảm bảo modal xóa bị đóng
+    setSelectedDevice(null)
+  }
 
   const handleSaveChanges = async () => {
     if (isAddMode) {
       try {
-        await addDevice(newDevice);
-        setDevices((prevDevices) => [...prevDevices, newDevice]);
+        await addDevice(newDevice)
+        setDevices((prevDevices) => [...prevDevices, newDevice])
       } catch (error) {
-        console.error('Lỗi khi thêm thiết bị mới:', error);
+        console.error('Lỗi khi thêm thiết bị mới:', error)
       }
     } else {
       try {
-        await updateDevice(selectedDevice.deviceId, selectedDevice);
+        await updateDevice(selectedDevice.deviceId, selectedDevice)
         getAllDevice()
           .then((response) => {
-            setDevices(response.data);
+            setDevices(response.data)
           })
           .catch((error) => {
-            console.error('Lỗi khi lấy thông tin thiết bị:', error);
-          });
+            console.error('Lỗi khi lấy thông tin thiết bị:', error)
+          })
       } catch (error) {
-        console.error('Lỗi khi lưu thay đổi thiết bị:', error);
+        console.error('Lỗi khi lưu thay đổi thiết bị:', error)
       }
     }
-    setModalVisible(false);
-  };
+    setModalVisible(false)
+  }
 
-  // Hàm thay đổi trang
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+    setCurrentPage(pageNumber)
+  }
 
-  // Số trang
-  const pageNumbers = [];
+  const pageNumbers = []
   for (let i = 1; i <= Math.ceil(devices.length / devicesPerPage); i++) {
-    pageNumbers.push(i);
+    pageNumbers.push(i)
   }
 
   return (
@@ -148,7 +164,9 @@ const Device = () => {
               <CTableBody>
                 {currentDevices.map((device) => (
                   <CTableRow key={device._id}>
-                    <CTableDataCell>{device.deviceId}</CTableDataCell>
+                    <CTableDataCell>
+                      <Link to={`/deviceInfomation/${device.deviceId}`}>{device.deviceId}</Link>
+                    </CTableDataCell>
                     <CTableDataCell>{device.name}</CTableDataCell>
                     <CTableDataCell>{device.location}</CTableDataCell>
                     <CTableDataCell>
@@ -180,7 +198,7 @@ const Device = () => {
                         <CButton color="primary" onClick={() => handleEditClick(device)}>
                           <CIcon icon={cilPenAlt} />
                         </CButton>
-                        <CButton color="danger" onClick={() => handleDeleteClick(device.deviceId)}>
+                        <CButton color="danger" onClick={() => handleDeleteClick(device)}>
                           <CIcon icon={cilTrash} className="text-white" />
                         </CButton>
                       </div>
@@ -207,6 +225,26 @@ const Device = () => {
         </CCard>
       </CCol>
 
+      {/* Modal Xác nhận xóa thiết bị */}
+      <CModal visible={deleteModalVisible} onClose={handleCloseModal}>
+        <CModalHeader>
+          <CModalTitle>Xác nhận xóa</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          Bạn có chắc chắn muốn xoá thiết bị <strong>{selectedDevice?.deviceId}</strong> khỏi hệ
+          thống?
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={handleCloseModal}>
+            Hủy
+          </CButton>
+          <CButton color="danger" onClick={handleConfirmDelete}>
+            Xóa
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal thêm/sửa thiết bị */}
       <CModal visible={modalVisible} onClose={handleCloseModal}>
         <CModalHeader>
           <CModalTitle>{isAddMode ? 'Thêm thiết bị mới' : 'Chỉnh sửa thiết bị'}</CModalTitle>
@@ -277,12 +315,12 @@ const Device = () => {
             Đóng
           </CButton>
           <CButton color="primary" onClick={handleSaveChanges}>
-            Lưu
+            Lưu thay đổi
           </CButton>
         </CModalFooter>
       </CModal>
     </CRow>
-  );
-};
+  )
+}
 
-export default Device;
+export default Device
